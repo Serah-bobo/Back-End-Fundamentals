@@ -1,0 +1,49 @@
+//RDBMS: relational database tabular data, tables(entity eg person),columns(schemas eg,username,age),rows
+(actual data)
+
+//Mongodb is NoSQL(non-relational) no defined schema ,no tabular,no relationship between data
+//Mongodb adds a key to each document _id
+// database: one/more collections
+//collections:  group of mongodb database, group of documents
+//document : set of key-value pair eg, {firstName: Serah}
+//schema: structure or organization of data within a document
+//use <database name> to create a new database or pick existing database
+//db.dropdatabase:to drop an existing database
+//db:which database you are in
+//BSON: binary encoded json has some added data types eg timestamp,date,object _id
+//json key value easy to parse
+
+1.INSERTING DOCUMENTS
+/every document has a unique value _id
+//the _id can be changed not recommended
+//db.collectionname.insertone({}) : insert one document
+//db.collectionname.insertmany([{},{}]) : insert multiple documents
+
+2.UPDATE DOCUMENTS
+//update one document
+db.collectionname.updateone(
+    {name:"name},
+    {
+        $set:{
+            name:"name",
+            isActive: true
+        }
+    }
+)
+//db.collection.replaceOne()
+Replaces at most a single document that match a specified filter 
+even though multiple documents may match the specified filter.
+//db.collection.updateMany()
+Update all documents that match a specified filter.
+
+3.READ data
+//find({}):find all documents i n collection
+//db.collection.findone():first document
+//db.leads.find({"city":"Nairobi"}):retuns all documents that has that filter city
+//db.leads.findOneAndReplace({"name":"Serah"},{"mobile":"0740968703"})//replacing  with tha filter
+//db.leads.findOneAndUpdate({"name":"Joy"},{$set:{address:"Kikuyu"}})//updating document with that filter
+//db.leads.findOneAndDelete({"name":"Serah"})//deleting document with Serah
+
+4.DELETE data
+//db.collection.deleteone():delete one document
+//db.collection.deleteMany({}):delete all documents
