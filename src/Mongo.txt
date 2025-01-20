@@ -76,3 +76,39 @@ $	-Matches the end of a string.db.students.find({ name: { $regex: "^A" } });//al
 
 7.HIDING OR GETTING SPECIFIC fields
 //db.leads.find({},{name:1 ,_id:0})-find name field only hide id with 0
+
+8. AGGREGATES
+//aggregation is process of processing documents and returning computed results.
+//it works like find()method
+//aggregation pipelines:it is an array,series of stages that process documents(modify or add elements in a document)
+$match: Filters documents based on given conditions.
+ Similar to the find() query but part of an aggregation pipeline.
+
+$group: Groups documents together to apply aggregate functions (e.g., sum, average, max, etc.).
+ This is how you perform operations like counting the number of documents or summing a field.
+
+$project: Reshapes the documents, including adding or removing fields or applying expressions to modify values.
+
+$sort: Orders documents by specified fields.
+
+$skip and $limit: Skips a certain number of documents or limits the result to a specific number of documents.
+
+$unwind: Deconstructs an array field from each document, outputting one document for each element of the array.
+
+$lookup: Performs a left outer join with another collection to combine documents from two different collections.
+var.orders.pipeline=[
+    //$sort:order documents by specified field
+    {$sort:{quantity:1}}//smallest to largest
+    {$limit:3}
+]
+db.orders.aggregate(pipeline)
+
+var pipeline = [
+    // Sort order documents by the specified field
+    { $sort: { quantity: 1 } },
+    // Match documents with the specified condition
+    { $match: { size: "medium" } },
+    // Limit the number of documents
+    { $limit: 1 }
+];
+db.orders.aggregate(pipeline);
