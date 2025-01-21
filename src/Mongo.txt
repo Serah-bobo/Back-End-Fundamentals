@@ -103,12 +103,128 @@ var.orders.pipeline=[
 ]
 db.orders.aggregate(pipeline)
 
+// Define the aggregation pipeline
 var pipeline = [
-    // Sort order documents by the specified field
-    { $sort: { quantity: 1 } },
-    // Match documents with the specified condition
-    { $match: { size: "medium" } },
-    // Limit the number of documents
-    { $limit: 1 }
+    // Stage 1: Filter (Match) documents
+    {
+        $match: {
+            // Only include orders where the size is "medium"
+            // and the date is within the range 2021-01-01 to 2022-12-31
+            size: "medium",
+            date: {
+                $gte: ISODate("2021-01-01"),
+                $lt: ISODate("2022-12-31")
+            }
+        }
+    },
+
+    // Stage 2: Sort documents by quantity in descending order
+    {
+        $sort: {
+            quantity: -1 // Sort by `quantity` field in descending order
+        }
+    },
+
+    // Stage 3: Add a calculated field (`revenue`)
+    {
+        $addFields: {
+            revenue: {
+                // Calculate the total revenue for each order as price * quantity
+                $multiply: ["$price", "$quantity"]
+            }
+        }
+    },
+
+    // Stage 4: Unwind arrays (if applicable)
+    // Note: For this dataset, there's no array field, but we add it as an example.
+    // Uncomment this block if your collection contains arrays.
+    /*
+    {
+        $unwind: {
+            path: "$arrayField", // Replace "arrayField" with the name of your array field
+            preserveNullAndEmptyArrays: true // Keep documents even if the array is null/empty
+        }
+    },
+    */
+
+    // Stage 5: Group data by `name` and calculate aggregate metrics
+    {
+        $group: {
+            _id: "$name", // Group by pizza name
+            totalRevenue: { $sum: "$revenue" }, // Total revenue per pizza
+            totalQuantity: { $sum: "$quantity" }, // Total quantity per pizza
+            averagePrice: { $avg: "$price" }, // Average price per pizza
+            minPrice: { $min: "$price" }, // Minimum price
+            maxPrice: { $max: "$price" }, // Maximum price
+            ordersCount: { $count: {} } // Count the number of documents (orders)
+        }
+    },
+
+    // Stage 6: Add another calculated field for average revenue per order
+    {
+        $addFields: {
+            avgRevenuePerOrder: {
+                // Divide total revenue by the total number of orders
+                $divide: ["$totalRevenue", "$ordersCount"]
+            }
+        }
+    },
+
+    // Stage 7: Sort grouped data by total revenue
+    {
+        $sort: {
+            totalRevenue: -1 // Sort by `totalRevenue` in descending order
+        }
+    },
+
+    // Stage 8: Limit the number of documents to 3 (e.g., top 3 pizzas by revenue)
+    { 
+        $limit: 3 
+    },
+
+    // Stage 9: Skip the first document in the result set
+    {
+        $skip: 1
+    },
+
+    // Stage 10: Count the remaining documents
+    {
+        $count: "remainingDocuments"
+    }
 ];
+
+// Execute the pipeline
 db.orders.aggregate(pipeline);
+
+9. INDEX
+//An index  is a tool that makes searching through your data faster, like a table of contents in a book
+Types of Indexes in MongoDB
+MongoDB supports the following types of indexes:
+1. Single Field Index: Index on a single field.
+2. Compound Index: Index on multiple fields.
+3. Multikey Index: Index for fields that contain arrays.
+4. Text Index: Index for full-text search.
+5. Geospatial Index: Index for geographical data.
+6. Hashed Index: Index for hashed values, often used with sharding.
+7. Wildcard Index: Dynamic indexing for all fields in a document.
+//methods
+// Create an index on the `name` field
+db.orders.createIndex({ name: 1 });
+// Retrieve indexes for the `orders` collection
+db.orders.getIndexes();
+// Drop the index named `name_1`
+db.orders.dropIndex("name_1");
+//sort, find
+db.students.find().sort( { gpa: 1, name: -1 } )
+
+10. DATA MODELLING
+//Data modeling refers to the organization of data within a database and the links between related entities.
+// Data in MongoDB has a flexible schema model, which means:
+//Documents within a single collection are not required to have the same set of fields.
+//A field's data type can differ between documents within a collection.
+//Embedded Data
+Embedded documents store related data in a single document structure.
+//References
+References store relationships between data by including links, called references, from one document to another. 
+//For example, a customerId field in an orders collection indicates a reference to a document in a customers collection.
+
