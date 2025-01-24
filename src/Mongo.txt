@@ -225,6 +225,9 @@ db.students.find().sort( { gpa: 1, name: -1 } )
 //Embedded Data
 Embedded documents store related data in a single document structure.
 //References
-References store relationships between data by including links, called references, from one document to another. 
+References store data in different documents them link them using  unique ids 
 //For example, a customerId field in an orders collection indicates a reference to a document in a customers collection.
+Denormalization vs Normalization
+//Denormalization: Data duplication to optimize for read operations (fewer joins).
+//Normalization: Breaking data into smaller tables (or collections) to avoid duplication.
 
