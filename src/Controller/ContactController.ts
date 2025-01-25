@@ -20,3 +20,18 @@ export const getAllContacts = async (req: Request, res: Response): Promise<void>
         res.status(400).json({message: (err as Error).message})
     }
  }
+
+ //get a single contact 
+ export const getContactById=async(req: Request,res: Response):Promise<void>=>{
+    
+    try{
+        const contact=await Contact.findById(req.params.id)
+        if(!contact){
+            res.status(404).json({ message: "Contact not found" });
+            return;
+        }
+        res.status(200).json(contact)
+    }catch(error){
+        res.status(500).json({ error: (error as Error).message });
+    }
+ }

@@ -12,6 +12,9 @@ app.use(express.json())
 const mongoURI = process.env.MONGO_URI;
 app.use("/api/contacts", ContactRoutes)
 
+router.route("/:id")
+  .get(getContactById)
+us
 // Root route
 app.get("/", (req, res) => {
   res.send("Contact Manager API is running...");
