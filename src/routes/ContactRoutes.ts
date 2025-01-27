@@ -6,5 +6,9 @@ const router=express.Router();
 router.route("/")
 .get(getAllContacts)
 .post(createContact)
+//
+router.route("/:id")
 
 export default router;
+
+
